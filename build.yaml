@@ -11,10 +11,10 @@ include:
   - board: xiao_ble//zmk
     shield: circa40plus_left
     snippet: zmk-usb-logging
-    cmake-args: -DCONFIG_ZMK_LOG_LEVEL=4 -DCONFIG_ZMK_SLEEP=n -DCONFIG_LOG_BUFFER_SIZE=16384 -DCONFIG_LOG_PROCESS_THREAD_STARTUP_DELAY_MS=8000
+    cmake-args: -DCONFIG_ZMK_LOG_LEVEL_DBG=y -DCONFIG_ZMK_SLEEP=n -DCONFIG_LOG_BUFFER_SIZE=16384 -DCONFIG_LOG_PROCESS_THREAD_STARTUP_DELAY_MS=8000
     artifact-name: Circa40plus-left-usb-logging
   - board: xiao_ble//zmk
     shield: circa40plus_right
     snippet: zmk-usb-logging
-    cmake-args: -DCONFIG_ZMK_LOG_LEVEL=4 -DCONFIG_ZMK_SLEEP=n -DCONFIG_LOG_BUFFER_SIZE=16384 -DCONFIG_LOG_PROCESS_THREAD_STARTUP_DELAY_MS=8000
+    cmake-args: -DCONFIG_ZMK_LOG_LEVEL_DBG=y -DCONFIG_ZMK_SLEEP=n -DCONFIG_LOG_BUFFER_SIZE=16384 -DCONFIG_LOG_PROCESS_THREAD_STARTUP_DELAY_MS=8000
     artifact-name: Circa40plus-right-usb-logging
