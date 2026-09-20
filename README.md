@@ -42,6 +42,43 @@ west build -s zmk/app -d build/left -b xiao_ble//zmk -- -DZMK_CONFIG="$PWD/confi
 west build -s zmk/app -d build/right -b xiao_ble//zmk -- -DZMK_CONFIG="$PWD/config" -DSHIELD=circa40plus_right
 ```
 
+## USBログ版（診断用）
+
+通常版・settings-reset版に加えて、同じActionsで次の2つを生成します。
+
+- `Circa40plus-left-usb-logging.uf2`：左側のキー走査・左右間通信のログ。
+- `Circa40plus-right-usb-logging.uf2`：右側のキー走査・接続状態・PAW3222のエラーや移動量のログ。
+
+通常版と同じGPIO・キーマップ・ペアリング領域を使います。ログ版だけ、公式の
+`zmk-usb-logging` snippet、ZMK DEBUGレベル、16KiBログバッファ、出力開始8秒遅延、
+MCUディープスリープ無効を指定しています。PAW3222ドライバ自体は変更していません。
+通常版の省電力設定はそのままです。ログ版ではスリープ復帰の再現試験はできません。
+
+### Windowsでログを取得する
+
+1. Actions成功後に `firmware` をダウンロードし、調べたい側に対応するログ版UF2を書き込みます。
+   PAW3222の調査なら右側だけログ版にすればよく、左側は通常版でも構いません。
+2. その側のXIAOをデータ通信対応USBケーブルでPCに接続します。
+3. デバイスマネージャーの「ポート（COMとLPT）」で追加されたCOM番号を確認します。
+4. PuTTY / Tera Termなどのシリアル端末でそのCOMポートを開きます。
+   設定目安は115200 bps、8 bit、パリティなし、ストップ1、フロー制御なしです。
+5. 端末のログ保存を開始し、キー入力・ボール移動など問題の操作を再現します。
+
+起動時のログを調べる場合は、端末を準備してからリセットを**1回**押し、COMポートが
+戻ったら速やかに再接続します（2回押すとUF2ブートローダーになります）。
+ログ出力は起動から約8秒後に始まります。接続タイミングやバッファの上限によっては、
+すべての起動ログを保存できるとは限りません。
+
+右側では `paw32xx` の `Invalid product id` / `Device configuration failed` 等のエラーや、
+ボール移動時の `x=... y=...` が確認対象です。成功時に必ず初期化完了メッセージが出るとは限りません。
+左右それぞれのログは、その側のUSB接続から取得します。左側ログが右側へ転送されるわけではありません。
+
+ログにはキー位置や入力に関する情報が含まれることがあります。取得中はパスワード等を入力せず、
+共有前に内容を確認してください。ログ版は消費電力と処理負荷が増えるため、診断後は通常版へ戻してください。
+切り替えだけなら通常はsettings-resetを書き込む必要はありません。
+
+参考：[ZMK公式 USB Logging](https://zmk.dev/docs/development/usb-logging)
+
 ## 初期キーマップ
 
 ### Keymap Editorの表示
