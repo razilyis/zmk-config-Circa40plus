@@ -1,0 +1,11 @@
+/build/
+/.west/
+/zmk/
+/zephyr/
+/modules/
+/tools/
+/bootloader/
+/zmk-driver-paw3222/
+*.uf2
+*.hex
+__pycache__/

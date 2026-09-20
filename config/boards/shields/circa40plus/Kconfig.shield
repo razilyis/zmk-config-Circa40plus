@@ -1,0 +1,5 @@
+config SHIELD_CIRCA40PLUS_LEFT
+    def_bool $(shields_list_contains,circa40plus_left)
+
+config SHIELD_CIRCA40PLUS_RIGHT
+    def_bool $(shields_list_contains,circa40plus_right)

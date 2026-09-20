@@ -1,0 +1,10 @@
+file_format: "1"
+id: circa40plus
+name: Circa40 Plus
+type: shield
+url: https://zmk.dev/
+requires: [seeed_xiao]
+features: [keys, pointer]
+siblings:
+  - circa40plus_left
+  - circa40plus_right

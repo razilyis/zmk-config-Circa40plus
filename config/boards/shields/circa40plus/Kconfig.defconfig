@@ -1,0 +1,19 @@
+if SHIELD_CIRCA40PLUS_LEFT || SHIELD_CIRCA40PLUS_RIGHT
+
+config ZMK_KEYBOARD_NAME
+    default "Circa40 Plus"
+
+config ZMK_SPLIT
+    default y
+
+endif
+
+if SHIELD_CIRCA40PLUS_RIGHT
+
+config ZMK_SPLIT_ROLE_CENTRAL
+    default y
+
+config ZMK_POINTING
+    default y
+
+endif
