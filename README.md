@@ -44,6 +44,18 @@ west build -s zmk/app -d build/right -b xiao_ble//zmk -- -DZMK_CONFIG="$PWD/conf
 
 ## 初期キーマップ
 
+### Keymap Editorの表示
+
+`config/circa40plus.json` に基板準拠の表示レイアウトを定義しています。
+同名の `circa40plus.keymap` と組み合わせて読み込みます。
+JSONの配列順は47個のbindings順に対応し、`row` / `col` はテキスト整形用です（GPIO行列番号ではありません）。
+`x` / `y` / `w` は1uを17mmとして、PCBのスイッチ中心と指定済みのキー幅から定義しています。
+SW7=1.25u、SW13=1.75u、SW32=1.75u、SW38=1.25u、SW49=1.5uです。
+GitHub反映後はKeymap Editorを再読み込みし、対象リポジトリとkeymapを選び直してください。
+このJSONは表示専用で、ファームウェアのGPIO・行列変換・キー動作を変更しません。
+
+### キー割り当て
+
 提示されたKLEを基本にしています。空欄・Meta等の用途未指定箇所は次の仮割り当てです。
 `config/circa40plus.keymap` で変更できます。OSの配列はUS配列を想定しています。
 

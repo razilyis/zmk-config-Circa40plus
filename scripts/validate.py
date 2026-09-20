@@ -1,5 +1,6 @@
 """Read-only static checks; optional KiCad PCB and schematic MCU cross-checks."""
 import argparse
+import json
 from pathlib import Path
 import re
 import xml.etree.ElementTree as ET
@@ -38,6 +39,19 @@ def main():
     assert (3, 11) not in transform
     assert 'diode-direction = "col2row"' in common
 
+    layout = json.loads(text(ROOT / "config/circa40plus.json"))["layouts"]["default_layout"]["layout"]
+    assert [key["label"] for key in layout] == [f"SW{n}" for n in ORDER]
+    assert len({(key["row"], key["col"]) for key in layout}) == 47
+    assert layout == sorted(layout, key=lambda key: (key["row"], key["col"]))
+    widths = {7: 1.25, 13: 1.75, 32: 1.75, 38: 1.25, 49: 1.5}
+    for key, number in zip(layout, ORDER):
+        assert key.get("w", 1) == widths.get(number, 1)
+    for index, a in enumerate(layout):
+        for b in layout[index + 1:]:
+            assert not (min(a["x"] + a.get("w", 1), b["x"] + b.get("w", 1)) > max(a["x"], b["x"]) and
+                        min(a["y"] + 1, b["y"] + 1) > max(a["y"], b["y"])), (a, b)
+    print("PASS: editor layout has 47 ordered keys, correct widths and no overlaps")
+
     keymap = text(ROOT / "config/circa40plus.keymap")
     layers = re.findall(r"bindings\s*=\s*<([^>]+)>;", keymap)
     assert len(layers) == 3
@@ -75,6 +89,16 @@ def main():
             round(pcbnew.ToMM(fps[ref].GetPosition().y), 2),
             pcbnew.ToMM(fps[ref].GetPosition().x)))
         assert physical_order == [f"SW{n}" for n in ORDER]
+        anchor = fps["SW1"].GetPosition()
+        origin_x = pcbnew.ToMM(anchor.x) - 17 / 2
+        origin_y = pcbnew.ToMM(anchor.y) - 17 / 2
+        for key in layout:
+            point = fps[key["label"]].GetPosition()
+            expected_x = origin_x + (key["x"] + key.get("w", 1) / 2) * 17
+            expected_y = origin_y + (key["y"] + 0.5) * 17
+            assert abs(pcbnew.ToMM(point.x) - expected_x) < 0.001, key
+            assert abs(pcbnew.ToMM(point.y) - expected_y) < 0.001, key
+        print("PASS: all 47 editor key centers match the PCB at 17 mm pitch (within 0.001 mm)")
         for number, rc in zip(ORDER, transform):
             ref = f"SW{number}"
             sw = pads(ref)
