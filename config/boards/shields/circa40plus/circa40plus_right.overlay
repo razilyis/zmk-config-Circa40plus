@@ -1,5 +1,6 @@
 #include "circa40plus.dtsi"
 #include <zephyr/dt-bindings/pinctrl/nrf-pinctrl.h>
+#include <input/processors.dtsi>
 
 &default_transform { col-offset = <6>; };
 
@@ -57,9 +58,28 @@
     };
 };
 
+/* デフォルトの zip_temp_layer ノードを拡張:
+ * - require-prior-idle-ms: 直前のキー入力から 150ms 以上経っていないと
+ *   AML を発動させない（タイプ中に手のひらがボールへ軽く触れた程度の誤発動を防ぐ）。
+ * - excluded-positions: mouse レイヤー (circa40plus.keymap の4番目 = レイヤー3) の
+ *   LCLK(21) / MCLK(22) / RCLK(23) の位置。この3キー以外が押されたらタイムアウト前でも
+ *   即座にAML終了、この3キー（クリック自身）を押してもAMLは維持される。
+ *   位置番号は circa40plus.dtsi の matrix-transform 順（0始まり、行ごとに連番）。 */
+&zip_temp_layer {
+    require-prior-idle-ms = <150>;
+    excluded-positions = <21 22 23>;
+};
+
 / {
     trackball_listener: trackball_listener {
         compatible = "zmk,input-listener";
         device = <&trackball>;
+
+        /* Auto Mouse Layer: ボールが動いた瞬間に mouse レイヤー(3, LCLK/MCLK/RCLK)を
+         * 自動オンにし、動きが無くなってから 500ms 後に自動オフに戻す。
+         * ベースの LCLK/RCLK・systemレイヤーのMCLKはそのまま残しているので、
+         * 従来通りの手動アクセスと併用可能。タイミングが合わなければ
+         * 500 の数値だけ調整する（大きいほど戻るまで長く留まる）。 */
+        input-processors = <&zip_temp_layer 3 500>;
     };
 };
